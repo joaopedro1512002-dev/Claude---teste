@@ -1,0 +1,677 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+</head>
+<body>
+<title>Atto Pedidos Online</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+/* Layout: faixa de aviso + topo com abas; conteúdo em coluna central de 1120px.
+   Configurador = coluna de formulário + coluna fixa com prévia 3D, resumo e preço. */
+:root{
+  --bg:#F2F5F3; --surface:#FFFFFF; --surface-2:#E9EFEB; --stage:#E4EAE6;
+  --ink:#17211D; --ink-2:#52625B; --line:#D2DAD5;
+  --accent:#0A6B58; --accent-ink:#FFFFFF; --accent-soft:#D8EEE6;
+  --warn:#8A4F00; --warn-soft:#FBEBCF; --good:#1C7041; --good-soft:#DAF0E1; --bad:#A12E2A; --bad-soft:#FADFDD;
+  --f-display:'Archivo',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --f-body:'IBM Plex Sans',system-ui,-apple-system,'Segoe UI',sans-serif;
+  --f-mono:'IBM Plex Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0E1412; --surface:#161E1B; --surface-2:#1E2824; --stage:#1B2420;
+  --ink:#E6EEE9; --ink-2:#9AA9A2; --line:#2B3732;
+  --accent:#4FC4A8; --accent-ink:#07201A; --accent-soft:#143B32;
+  --warn:#E9B35E; --warn-soft:#382A11; --good:#6DD197; --good-soft:#143222; --bad:#F28C86; --bad-soft:#3C1A18; color-scheme:dark;}}
+:root[data-theme="dark"]{
+  --bg:#0E1412; --surface:#161E1B; --surface-2:#1E2824; --stage:#1B2420;
+  --ink:#E6EEE9; --ink-2:#9AA9A2; --line:#2B3732;
+  --accent:#4FC4A8; --accent-ink:#07201A; --accent-soft:#143B32;
+  --warn:#E9B35E; --warn-soft:#382A11; --good:#6DD197; --good-soft:#143222; --bad:#F28C86; --bad-soft:#3C1A18; color-scheme:dark;}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.5;margin:0;padding-inline:0}
+h1,h2,h3{font-family:var(--f-display);margin:0;line-height:1.15;text-wrap:balance;letter-spacing:-.01em}
+h1{font-size:clamp(1.7rem,4vw,2.5rem);font-weight:800}
+h2{font-size:1.35rem;font-weight:700}
+h3{font-size:1.05rem;font-weight:700}
+p{margin:0}
+small,.sm-t{font-size:.8125rem;color:var(--ink-2)}
+.mono{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+.num{font-variant-numeric:tabular-nums}
+button{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.demo{background:var(--warn-soft);color:var(--warn);font-size:.8125rem;padding:.4rem 1rem;text-align:center;border-bottom:1px solid var(--line)}
+.top{background:var(--surface);border-bottom:1px solid var(--line);position:sticky;top:env(safe-area-inset-top,0px);z-index:20}
+.top-in{max-width:1120px;margin:0 auto;padding:.7rem 1rem;display:flex;gap:.75rem 1.25rem;align-items:center;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:.55rem;font-family:var(--f-display);font-size:1.1rem;color:var(--ink);margin-right:auto}
+.brand b{font-weight:800}.brand svg{color:var(--accent)}
+.who{display:flex;flex-direction:column;line-height:1.25;min-width:0}
+.who-n{font-weight:600;font-size:.875rem}.who-u{font-size:.75rem;color:var(--ink-2)}
+.tabs{max-width:1120px;margin:0 auto;padding:0 1rem .55rem;display:flex;gap:.25rem;flex-wrap:wrap}
+.tab{background:none;border:0;border-radius:6px;padding:.4rem .75rem;cursor:pointer;color:var(--ink-2);font-weight:500;font-size:.9rem;display:flex;gap:.4rem;align-items:center}
+.tab:hover{background:var(--surface-2);color:var(--ink)}
+.tab[aria-current="page"]{background:var(--accent-soft);color:var(--accent);font-weight:600}
+.badge{background:var(--accent);color:var(--accent-ink);border-radius:99px;font-size:.7rem;padding:0 .45rem;min-width:1.2rem;text-align:center;font-weight:600}
+.wrap{max-width:1120px;margin:0 auto;padding:1.5rem 1rem 6rem;display:flex;flex-direction:column;gap:1.5rem}
+.btn{border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:.55rem 1rem;cursor:pointer;font-weight:600;font-size:.9rem;display:inline-flex;gap:.4rem;align-items:center;justify-content:center;text-decoration:none;color:var(--ink)}
+.btn:hover{background:var(--surface-2)}
+.btn.pri{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.btn.pri:hover{filter:brightness(1.08)}
+.btn.ghost{border-color:transparent;background:none}
+.btn.ghost:hover{background:var(--surface-2)}
+.btn.sm{padding:.3rem .65rem;font-size:.8125rem}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:1.1rem}
+.row{display:flex;gap:.75rem;flex-wrap:wrap;align-items:center}
+.row.sp{justify-content:space-between}
+.grid{display:grid;gap:1rem}
+.g2{grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr))}
+.g3{grid-template-columns:repeat(auto-fit,minmax(min(100%,230px),1fr))}
+.stack{display:flex;flex-direction:column;gap:.75rem}
+.lead{color:var(--ink-2);max-width:62ch}
+.chip{display:inline-flex;align-items:center;gap:.3rem;border-radius:99px;padding:.1rem .6rem;font-size:.75rem;font-weight:600;background:var(--surface-2);color:var(--ink-2)}
+.chip.good{background:var(--good-soft);color:var(--good)}.chip.warn{background:var(--warn-soft);color:var(--warn)}
+.chip.acc{background:var(--accent-soft);color:var(--accent)}.chip.bad{background:var(--bad-soft);color:var(--bad)}
+.eyebrow{font-size:.75rem;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-2);font-weight:600}
+/* login */
+.login{max-width:1000px;margin:0 auto;padding:2rem 1rem 4rem;display:flex;flex-direction:column;gap:1.75rem}
+.persona{display:flex;flex-direction:column;gap:.75rem}
+.persona .seg{display:flex;gap:.5rem;flex-wrap:wrap}
+.persona dl{margin:0;display:grid;grid-template-columns:auto 1fr;gap:.15rem .75rem;font-size:.85rem}
+.persona dt{color:var(--ink-2)}.persona dd{margin:0}
+/* stepper */
+.steps{list-style:none;margin:0;padding:0;display:flex;gap:.35rem;flex-wrap:wrap}
+.steps button{display:flex;gap:.4rem;align-items:center;border:1px solid var(--line);background:var(--surface);border-radius:99px;padding:.25rem .75rem .25rem .3rem;cursor:pointer;font-size:.8125rem;font-weight:500;color:var(--ink-2)}
+.steps .n{width:1.35rem;height:1.35rem;border-radius:50%;background:var(--surface-2);display:grid;place-items:center;font-size:.72rem;font-weight:700}
+.steps li.cur button{border-color:var(--accent);color:var(--ink);font-weight:600}
+.steps li.cur .n{background:var(--accent);color:var(--accent-ink)}
+.steps li.done .n{background:var(--good-soft);color:var(--good)}
+.cfg{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,400px);gap:1.25rem;align-items:start}
+@media (max-width:900px){.cfg{grid-template-columns:minmax(0,1fr)}}
+.side{position:sticky;top:7.5rem;display:flex;flex-direction:column;gap:.75rem}
+@media (max-width:900px){.side{position:static}}
+.stage{background:var(--stage);border:1px solid var(--line);border-radius:10px;padding:.5rem}
+.stage svg{display:block;width:100%;height:auto;max-height:290px}
+.opts{display:grid;gap:.6rem;grid-template-columns:repeat(auto-fit,minmax(min(100%,210px),1fr))}
+.opt{text-align:left;border:1.5px solid var(--line);background:var(--surface);border-radius:10px;padding:.8rem;cursor:pointer;display:flex;flex-direction:column;gap:.25rem}
+.opt:hover{border-color:var(--ink-2)}
+.opt[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-soft)}
+.opt b{font-family:var(--f-display)}
+.opt .tag{font-family:var(--f-mono);font-size:.72rem;color:var(--ink-2)}
+.field{display:flex;flex-direction:column;gap:.3rem}
+.field label,.lbl{font-weight:600;font-size:.85rem}
+input[type=number],input[type=text],input[type=date],textarea,select{font:inherit;border:1.5px solid var(--line);background:var(--surface);color:var(--ink);border-radius:8px;padding:.5rem .65rem;width:100%;min-width:0}
+input:focus,textarea:focus,select:focus{outline:2px solid var(--accent);outline-offset:0;border-color:var(--accent)}
+input[type=number]{font-family:var(--f-mono)}
+textarea{min-height:5rem;resize:vertical}
+.hint{font-size:.78rem;color:var(--ink-2)}.hint.err{color:var(--warn);font-weight:500}
+.unit{display:flex;align-items:center;gap:.4rem}.unit span{font-family:var(--f-mono);font-size:.8rem;color:var(--ink-2)}
+.swatches{display:flex;gap:.5rem;flex-wrap:wrap}
+.sw{display:flex;align-items:center;gap:.45rem;border:1.5px solid var(--line);background:var(--surface);border-radius:99px;padding:.25rem .75rem .25rem .3rem;cursor:pointer;font-size:.85rem}
+.sw i{width:1.1rem;height:1.1rem;border-radius:50%;display:block;border:1px solid rgba(0,0,0,.25)}
+.sw[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-soft);font-weight:600}
+.check{display:flex;gap:.6rem;align-items:flex-start;border:1.5px solid var(--line);border-radius:10px;padding:.7rem .8rem;cursor:pointer;background:var(--surface)}
+.check[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-soft)}
+.check input{margin-top:.25rem}
+.drop{border:2px dashed var(--line);border-radius:10px;padding:1rem;display:flex;flex-direction:column;gap:.5rem;align-items:flex-start;background:var(--surface)}
+.price{border-radius:10px;padding:.9rem;border:1px solid var(--line);background:var(--surface);display:flex;flex-direction:column;gap:.4rem}
+.price.est{border-color:var(--accent)}
+.price.man{background:var(--warn-soft);border-color:var(--warn)}
+.price .big{font-family:var(--f-display);font-weight:800;font-size:1.4rem;font-variant-numeric:tabular-nums}
+.price ul{margin:.2rem 0 0;padding-left:1.1rem;font-size:.85rem}
+.sum{display:grid;grid-template-columns:auto 1fr;gap:.2rem .8rem;font-size:.85rem;margin:0}
+.sum dt{color:var(--ink-2)}.sum dd{margin:0;min-width:0;overflow-wrap:anywhere}
+.tbl-w{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:.875rem}
+th,td{text-align:left;padding:.5rem .6rem;border-bottom:1px solid var(--line);white-space:nowrap}
+th{font-size:.75rem;text-transform:uppercase;letter-spacing:.06em;color:var(--ink-2)}
+tr.cur td{background:var(--accent-soft);font-weight:600}
+.item{display:grid;grid-template-columns:104px minmax(0,1fr) auto;gap:.9rem;align-items:center;padding:.8rem 0;border-bottom:1px solid var(--line)}
+.item:last-child{border-bottom:0}
+.item .thumb{background:var(--stage);border-radius:8px;padding:.15rem}
+.item .thumb svg{display:block;width:100%;height:auto}
+.item-b{display:flex;flex-direction:column;gap:.1rem;min-width:0}
+.item-p{text-align:right;font-variant-numeric:tabular-nums}
+@media (max-width:560px){.item{grid-template-columns:76px minmax(0,1fr)}.item-p{grid-column:1/-1;text-align:left}}
+.tl{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
+.tl li{display:flex;gap:.75rem;position:relative;padding-bottom:.9rem;color:var(--ink-2)}
+.tl li:last-child{padding-bottom:0}
+.tl li::before{content:"";position:absolute;left:.46rem;top:1.1rem;bottom:-.1rem;width:2px;background:var(--line)}
+.tl li:last-child::before{display:none}
+.tl .dot{width:1rem;height:1rem;border-radius:50%;border:2px solid var(--line);background:var(--surface);flex:none;margin-top:.15rem;z-index:1}
+.tl li.done .dot{background:var(--good);border-color:var(--good)}
+.tl li.done{color:var(--ink)}
+.tl li.cur .dot{border-color:var(--accent);background:var(--accent-soft);box-shadow:0 0 0 3px var(--accent-soft)}
+.tl li.cur{color:var(--ink)}
+.tl small{display:block}
+.act-card{display:flex;gap:1rem;align-items:center;justify-content:space-between;flex-wrap:wrap;border-left:4px solid var(--warn)}
+.empty{text-align:center;padding:2rem 1rem;color:var(--ink-2)}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(1rem + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--bg);padding:.6rem 1rem;border-radius:8px;font-size:.875rem;z-index:60;max-width:calc(100% - 2rem)}
+.modal-b{position:fixed;inset:0;background:rgba(10,15,13,.55);display:grid;place-items:center;padding:1rem;z-index:50}
+.modal{background:var(--surface);border-radius:12px;padding:1.25rem;max-width:460px;width:100%;display:flex;flex-direction:column;gap:.9rem;border:1px solid var(--line);max-height:100%;overflow:auto}
+.copybox{font-family:var(--f-mono);font-size:.82rem;background:var(--surface-2);border-radius:8px;padding:.6rem .7rem;user-select:all;overflow-wrap:anywhere}
+.autobar{position:fixed;left:0;right:0;bottom:0;background:var(--ink);color:var(--bg);padding:.8rem 1rem calc(.8rem + env(safe-area-inset-bottom,0px));z-index:40;display:flex;gap:1rem;align-items:center;justify-content:center;flex-wrap:wrap}
+.autobar .msg{max-width:70ch}
+.autobar .btn{background:transparent;color:var(--bg);border-color:var(--bg)}
+.pulse{width:.6rem;height:.6rem;border-radius:50%;background:#4FC4A8;display:inline-block;margin-right:.5rem}
+@media (prefers-reduced-motion:no-preference){.pulse{animation:pl 1.2s ease-in-out infinite}@keyframes pl{50%{opacity:.25}}}
+</style>
+
+<div id="app"></div>
+<div id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(function(){
+'use strict';
+
+/* ===== Catálogo e parâmetros de DEMONSTRAÇÃO (valores fictícios; a Atto ainda não informou os reais) ===== */
+var MODELOS={
+  maleta:{nome:'Maleta',fefco:'FEFCO 0201',desc:'Caixa padrão de transporte. As abas fecham no centro.',lim:{C:[150,900],L:[100,600],A:[60,700]},faca:0},
+  envio:{nome:'Caixa de envio',fefco:'FEFCO 0427',desc:'Montagem sem cola, com tampa integrada. Boa para e-commerce.',lim:{C:[120,500],L:[100,400],A:[30,250]},faca:380},
+  tampa:{nome:'Tampa e fundo',fefco:'Série 0300',desc:'Duas peças que se encaixam. Para produtos que pedem apresentação.',lim:{C:[150,700],L:[100,500],A:[50,400]},faca:380},
+  outro:{nome:'Outro modelo',fefco:'Sob consulta',desc:'Descreva o que precisa e a equipe comercial analisa.',manual:true,lim:{C:[1,9999],L:[1,9999],A:[1,9999]},faca:380}
+};
+var ONDAS={
+  B:{nome:'Onda B',tipo:'Simples',e:3,uso:'Conteúdo leve',preco:{kraft:2.9,branco:3.7}},
+  C:{nome:'Onda C',tipo:'Simples',e:4,uso:'Conteúdo leve a médio',preco:{kraft:3.2,branco:4.0}},
+  BC:{nome:'Onda BC',tipo:'Dupla',e:7,uso:'Conteúdo pesado ou empilhamento alto',preco:{kraft:5.0,branco:6.0}}
+};
+var COR={preto:{n:'Preto',hex:'#1B1B1B'},azul:{n:'Azul',hex:'#1F4FA3'},vermelho:{n:'Vermelho',hex:'#C62F2F'},verde:{n:'Verde',hex:'#1E7B4A'},amarelo:{n:'Amarelo',hex:'#E2B01B'},laranja:{n:'Laranja',hex:'#E0701F'}};
+var FACES={frente:'Só a frente',duas:'Frente e lateral',todas:'Todas as faces'};
+var FACES_N={frente:1,duas:2,todas:4};
+var ACAB={alca:'Alça de mão',divisoria:'Divisória interna',verniz:'Verniz localizado',ventil:'Furos de ventilação'};
+var PERDA=.06,MARGEM=.28,TOL=.10,SETUP=120,MINQ=300,MAXQ=20000;
+var TECH=/certifica|fsc|compress|laudo|teste|contato com alimento/i;
+var EXT=['pdf','ai','eps','svg','cdr','png','jpg','jpeg'];
+var STEPS=['Modelo','Medidas','Material','Impressão','Acabamento','Quantidade','Arte e revisão'];
+var DEF={nome:'',modelo:'maleta',C:400,L:300,A:250,onda:'C',capa:'kraft',imp:false,cores:[],quatro:false,faces:'frente',acab:[],qty:1000,data:'',arte:null,depois:false,obs:'',recompra:false};
+
+/* ===== Clientes fictícios ===== */
+var PERS=[
+ {id:'alimentos',empresa:'Boa Safra Alimentos Ltda',seg:'Indústria alimentícia',user:'Carlos Menezes',papel:'Comprador',cidade:'Anápolis/GO',
+  nota:'Repõe a mesma caixa todo mês. Quer preço e prazo previsíveis.',
+  packs:[{nome:'Caixa biscoito 400 g',s:{modelo:'maleta',C:420,L:300,A:260,onda:'C',capa:'kraft',imp:true,cores:['preto','vermelho'],faces:'duas'},qty:3000,arte:'biscoito_400g_v3.pdf'},
+         {nome:'Caixa display 12 un',s:{modelo:'maleta',C:360,L:240,A:180,onda:'B',capa:'kraft',imp:true,cores:['verde'],faces:'frente'},qty:1500,arte:'display_12un.ai'}],
+  demo:{nome:'Caixa biscoito 200 g',modelo:'maleta',C:380,L:260,A:220,onda:'C',capa:'kraft',imp:true,cores:['preto','vermelho'],faces:'duas',acab:[],qty:4000,arte:{nome:'biscoito_200g_v1.ai',size:3100000},obs:'Se possível, entrega em duas remessas.'}},
+ {id:'autopecas',empresa:'Cerrado Autopeças Ind. Ltda',seg:'Autopeças',user:'Juliana Prado',papel:'Logística',cidade:'Goiânia/GO',
+  nota:'Embala peças pesadas. Precisa de resistência e empilhamento.',
+  packs:[{nome:'Caixa pistão linha 7',s:{modelo:'maleta',C:520,L:320,A:180,onda:'BC',capa:'kraft',imp:true,cores:['preto'],faces:'frente'},qty:1500,arte:'pistao_l7.pdf'},
+         {nome:'Caixa junta cabeçote',s:{modelo:'tampa',C:400,L:300,A:90,onda:'C',capa:'branco',imp:true,cores:['azul','preto'],faces:'duas'},qty:800,arte:'junta_cab.pdf'}],
+  demo:{nome:'Caixa eixo cardan',modelo:'maleta',C:900,L:200,A:200,onda:'BC',capa:'kraft',imp:true,cores:['preto'],faces:'frente',acab:[],qty:1200,arte:{nome:'cardan_v2.pdf',size:1800000},obs:'Precisamos do laudo de teste de compressão.'}},
+ {id:'textil',empresa:'Malharia Pétala Ltda',seg:'Têxtil',user:'Patrícia Soares',papel:'Compradora',cidade:'Goiânia/GO',
+  nota:'Caixas de apresentação para camisas, com a marca em três cores.',
+  packs:[{nome:'Caixa camisa social',s:{modelo:'tampa',C:400,L:300,A:80,onda:'B',capa:'branco',imp:true,cores:['azul','preto','amarelo'],faces:'duas'},qty:800,arte:'camisa_social.ai'},
+         {nome:'Caixa meia (kit 3)',s:{modelo:'envio',C:260,L:180,A:70,onda:'B',capa:'kraft',imp:true,cores:['preto'],faces:'frente'},qty:1000,arte:'meia_kit.pdf'}],
+  demo:{nome:'Caixa camisa polo',modelo:'tampa',C:380,L:280,A:70,onda:'B',capa:'branco',imp:true,cores:['verde','preto','amarelo'],faces:'duas',acab:[],qty:900,arte:{nome:'polo_v4.pdf',size:5200000},obs:''}},
+ {id:'ecommerce',empresa:'Bem-Te-Vi Cosméticos (PME)',seg:'E-commerce (hipótese de público)',user:'Bianca Lopes',papel:'Marketing',cidade:'Brasília/DF',
+  nota:'Primeira compra de caixa personalizada. Pouca familiaridade técnica.',
+  packs:[{nome:'Caixa envio sérum',s:{modelo:'envio',C:220,L:160,A:90,onda:'B',capa:'branco',imp:true,cores:['verde','preto'],faces:'todas'},qty:500,arte:'serum_v2.pdf'},
+         {nome:'Caixa kit presente',s:{modelo:'envio',C:300,L:220,A:110,onda:'B',capa:'branco',imp:true,cores:['laranja'],faces:'duas'},qty:400,arte:'kit_presente.pdf'}],
+  demo:{nome:'Caixa envio creme 50 ml',modelo:'envio',C:250,L:180,A:90,onda:'B',capa:'branco',imp:true,cores:['verde','preto','amarelo'],faces:'todas',acab:['verniz'],qty:500,arte:{nome:'creme50_v1.svg',size:900000},obs:'Quero o logo bem centralizado.'}}
+];
+
+/* ===== Estado ===== */
+var S={user:null,view:'login',step:0,draft:null,editIdx:null,cart:[],quotes:[],orders:[],packs:[],selQ:null,selO:null,modal:null,auto:null,sent:null,seq:{c:120,o:3040},entrega:'Matriz, Anápolis/GO',dataCart:'',obsCart:''};
+
+/* ===== Utilitários ===== */
+function $(s){return document.querySelector(s);}
+function esc(t){return String(t==null?'':t).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+function num(n){return Number(n).toLocaleString('pt-BR');}
+function brl(n){return Number(n).toLocaleString('pt-BR',{style:'currency',currency:'BRL'});}
+function brl0(n){return Number(n).toLocaleString('pt-BR',{style:'currency',currency:'BRL',maximumFractionDigits:0});}
+function fmtD(d){return new Date(d).toLocaleDateString('pt-BR');}
+function fmtT(d){return new Date(d).toLocaleString('pt-BR',{dateStyle:'short',timeStyle:'short'});}
+function daysAgo(n){return new Date(Date.now()-n*86400000);}
+function clone(o){return JSON.parse(JSON.stringify(o));}
+function mk(over){return Object.assign({},clone(DEF),clone(over||{}));}
+function hashSpec(d){return [d.modelo,d.C,d.L,d.A,d.onda,d.capa,d.imp,d.cores.join('+'),d.faces,d.acab.join('+')].join('|');}
+var toastT=null;
+function toast(m){var el=$('#toast');el.innerHTML='<div class="toast">'+esc(m)+'</div>';clearTimeout(toastT);toastT=setTimeout(function(){el.innerHTML='';},3200);}
+
+/* ===== Cálculo da estimativa ===== */
+function area(d){
+  var C=Math.max(+d.C||1,1),L=Math.max(+d.L||1,1),A=Math.max(+d.A||1,1),e=ONDAS[d.onda].e;
+  if(d.modelo==='envio'){return (C+2*A+30+20)*(2*L+2*A+40+20)/1e6;}
+  if(d.modelo==='tampa'){return (C+A+20)*(L+A+20)*2/1e6;}
+  return (2*C+2*L+35+4*e+20)*(A+L+2*e+20)/1e6;
+}
+function escala(q){return q<500?1.12:q<1000?1.06:q<3000?1:q<10000?.95:.91;}
+function calc(d,qty){
+  qty=qty==null?(+d.qty||0):qty;
+  var mod=MODELOS[d.modelo],r=[];
+  if(mod.manual){r.push('Modelo fora do catálogo padrão');}
+  else{var out=[];[['C','comprimento'],['L','largura'],['A','altura']].forEach(function(k){var v=+d[k[0]],lim=mod.lim[k[0]];if(v<lim[0]||v>lim[1]){out.push(k[1]+' ('+lim[0]+' a '+lim[1]+' mm)');}});
+    if(out.length){r.push('Medida fora do limite automático: '+out.join(', '));}}
+  if(d.imp&&d.quatro){r.push('Mais de 3 cores de impressão');}
+  if(d.acab.length){r.push('Acabamento especial: '+d.acab.map(function(a){return ACAB[a].toLowerCase();}).join(', '));}
+  if(qty<MINQ){r.push('Quantidade abaixo do pedido mínimo da demonstração ('+num(MINQ)+')');}
+  if(qty>MAXQ){r.push('Quantidade acima do teto automático ('+num(MAXQ)+')');}
+  if(TECH.test(d.obs||'')){r.push('Pedido técnico nas observações (certificação ou teste)');}
+  var q=Math.max(qty,1),o=ONDAS[d.onda];
+  var mat=area(d)*o.preco[d.capa]*(1+PERDA);
+  var nc=d.imp?Math.min(d.cores.length||1,3):0,nf=d.imp?FACES_N[d.faces]:0;
+  var ferr=d.recompra?0:(nc*nf*55+(mod.faca||0));
+  var unit=(mat+nc*nf*0.03+(ferr+SETUP)/q)*(1+MARGEM)*escala(q);
+  return {manual:r.length>0,reasons:r,mid:unit,min:unit*(1-TOL),max:unit*(1+TOL),qty:qty};
+}
+function priceTxt(c,qty){
+  if(c.manual){return 'Sob consulta';}
+  return brl(c.min)+' a '+brl(c.max)+' /un';
+}
+function totTxt(c){return c.manual?'':brl0(c.min*c.qty)+' a '+brl0(c.max*c.qty);}
+function summary(d){
+  var m=MODELOS[d.modelo],o=ONDAS[d.onda];
+  var imp=d.imp?((d.quatro?'4 ou mais':String(d.cores.length||1))+' cor(es), '+FACES[d.faces].toLowerCase()):'sem impressão';
+  return m.nome+' · '+o.nome+' '+d.capa+' · '+imp;
+}
+
+/* ===== Prévia da caixa (projeção isométrica) ===== */
+function logoSVG(w,h,cores){
+  var m=Math.min(w,h),px=w*.14,py=h*.2,bw=w*.72,bh=h*.5,s='';
+  s+='<rect x="'+px+'" y="'+py+'" width="'+bw+'" height="'+bh+'" rx="'+(m*.04)+'" fill="'+cores[0]+'"/>';
+  s+='<text x="'+(w/2)+'" y="'+(py+bh*.62)+'" text-anchor="middle" font-family="Archivo,Arial,sans-serif" font-weight="800" font-size="'+Math.min(bh*.34,bw*.14)+'" fill="'+(cores[1]||'#F5F1E8')+'">SUA MARCA</text>';
+  if(cores[2]){s+='<rect x="'+px+'" y="'+(py+bh+h*.06)+'" width="'+bw+'" height="'+(h*.05)+'" fill="'+cores[2]+'"/>';}
+  return s;
+}
+function boxSVG(d,mini){
+  var C=Math.max(+d.C||1,1),L=Math.max(+d.L||1,1),A=Math.max(+d.A||1,1),W=360,H=280,c=.866,s=.5;
+  var k=Math.min((W-170)/((C+L)*c),(H-80)/((C+L)*s+A));
+  var minX=-L*c*k,maxX=C*c*k,minY=-A*k,maxY=(C+L)*s*k;
+  var tx=(W-(maxX-minX))/2-minX+14,ty=(H-(maxY-minY))/2-minY;
+  function X(x,y){return (x-y)*c*k+tx;}
+  function Y(x,y,z){return (x+y)*s*k-z*k+ty;}
+  function P(x,y,z){return X(x,y).toFixed(1)+','+Y(x,y,z).toFixed(1);}
+  var col=d.capa==='branco'?{t:'#F5F3EE',l:'#E3DFD4',r:'#CBC6B8',ln:'#8E897A'}:{t:'#DDBD90',l:'#C79B66',r:'#A67C4B',ln:'#6C4F2B'};
+  function poly(pts,f){return '<polygon points="'+pts.join(' ')+'" fill="'+f+'" stroke="'+col.ln+'" stroke-width="1" stroke-linejoin="round"/>';}
+  function ln(a,b){return '<polyline points="'+a+' '+b+'" fill="none" stroke="'+col.ln+'" stroke-width="1" stroke-linecap="round"/>';}
+  var g='';
+  g+=poly([P(0,0,A),P(C,0,A),P(C,L,A),P(0,L,A)],col.t);
+  g+=poly([P(0,L,0),P(C,L,0),P(C,L,A),P(0,L,A)],col.l);
+  g+=poly([P(C,0,0),P(C,L,0),P(C,L,A),P(C,0,A)],col.r);
+  if(d.modelo==='envio'){g+=ln(P(0,L*.8,A),P(C,L*.8,A));}
+  else if(d.modelo==='tampa'){g+=ln(P(0,L,A*.7),P(C,L,A*.7))+ln(P(C,L,A*.7),P(C,0,A*.7));}
+  else{g+=ln(P(0,L/2,A),P(C,L/2,A));}
+  if(d.imp){
+    var cores=(d.cores.length?d.cores:['preto']).map(function(id){return COR[id].hex;});
+    g+='<g transform="matrix('+(c*k).toFixed(4)+' '+(s*k).toFixed(4)+' 0 '+k.toFixed(4)+' '+X(0,L).toFixed(2)+' '+Y(0,L,A).toFixed(2)+')">'+logoSVG(C,A,cores)+'</g>';
+    if(d.faces!=='frente'){g+='<g transform="matrix('+(c*k).toFixed(4)+' '+(-s*k).toFixed(4)+' 0 '+k.toFixed(4)+' '+X(C,L).toFixed(2)+' '+Y(C,L,A).toFixed(2)+')">'+logoSVG(L,A,cores)+'</g>';}
+  }
+  if(!mini){
+    var lab='font-family="IBM Plex Mono,monospace" font-size="11" fill="var(--ink-2)"';
+    g+='<text x="'+(X(C/2,L)-8).toFixed(1)+'" y="'+(Y(C/2,L,0)+18).toFixed(1)+'" text-anchor="end" '+lab+'>C '+d.C+' mm</text>';
+    g+='<text x="'+(X(C,L/2)+8).toFixed(1)+'" y="'+(Y(C,L/2,0)+18).toFixed(1)+'" '+lab+'>L '+d.L+' mm</text>';
+    g+='<text x="'+(X(0,L)-8).toFixed(1)+'" y="'+(Y(0,L,A/2)+4).toFixed(1)+'" text-anchor="end" '+lab+'>A '+d.A+' mm</text>';
+  }
+  return '<svg viewBox="0 0 '+W+' '+H+'" role="img" aria-label="Prévia da caixa '+esc(MODELOS[d.modelo].nome)+' com '+d.C+' por '+d.L+' por '+d.A+' milímetros">'+g+'</svg>';
+}
+var LOGO='<svg width="26" height="26" viewBox="0 0 26 26" aria-hidden="true"><path d="M13 3 23 8.5v10L13 24 3 18.5v-10z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M3 8.5 13 14l10-5.5M13 14v10" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>';
+
+/* ===== Dados iniciais por cliente ===== */
+function stepsFor(hasArt){return hasArt?['Pedido confirmado','Aguardando arte','Prova enviada','Arte aprovada','Em produção','Pronto para expedição','Expedido','Entregue']:['Pedido confirmado','Em produção','Pronto para expedição','Expedido','Entregue'];}
+function mkOrder(itens,upto,ageDays,proto){
+  var hasArt=itens.some(function(i){return i.spec.imp;});var st=stepsFor(hasArt);
+  var idx=typeof upto==='string'?st.indexOf(upto):upto;var t0=daysAgo(ageDays),hist=[];
+  for(var i=0;i<=idx;i++){hist.push(new Date(t0.getTime()+i*86400000));}
+  return {id:'PED-'+new Date().getFullYear()+'-'+(S.seq.o++),quote:proto||'',itens:itens,steps:st,idx:idx,hist:hist,criada:t0};
+}
+function seed(p){
+  S.packs=[];S.orders=[];S.quotes=[];S.cart=[];
+  p.packs.forEach(function(k,i){var d=mk(k.s);d.nome=k.nome;d.qty=k.qty;d.arte={nome:k.arte,size:2400000};
+    var c=calc(d);S.packs.push({id:'k'+i,nome:k.nome,spec:d,qty:k.qty,ult:c.mid,quando:daysAgo(20+i*35)});});
+  var a=S.packs[0],b=S.packs[1];
+  S.orders.push(mkOrder([{spec:a.spec,qty:a.qty,mid:a.ult}],'Em produção',6));
+  S.orders.push(mkOrder([{spec:b.spec,qty:b.qty,mid:b.ult}],'Entregue',40));
+  var d2=clone(b.spec);d2.qty=b.qty*2;var c2=calc(d2);
+  S.quotes.push({id:'COT-'+new Date().getFullYear()+'-'+(S.seq.c++),status:'proposta',criada:daysAgo(2),itens:[{spec:d2,qty:d2.qty,mid:c2.mid,manual:false,firme:c2.mid*.97}],entrega:p.cidade,valida:new Date(Date.now()+5*86400000),hist:[daysAgo(2),daysAgo(1.5),daysAgo(1)]});
+}
+function doLogin(id){var p=PERS.filter(function(x){return x.id===id;})[0];S.user=p;seed(p);S.view='home';S.entrega=p.cidade;S.selQ=null;S.selO=null;S.modal=null;}
+
+/* ===== Telas ===== */
+function pill(t,k){return '<span class="chip '+(k||'')+'">'+esc(t)+'</span>';}
+function header(){
+  var n=S.cart.length;
+  function tab(act,v,l,extra,cur){return '<button class="tab" data-act="'+act+'" data-v="'+v+'"'+(cur?' aria-current="page"':'')+'>'+l+(extra||'')+'</button>';}
+  return '<div class="demo">Protótipo de demonstração. Empresas, preços e prazos são fictícios e não representam a Atto Embalagens.</div>'+
+  '<header class="top"><div class="top-in"><div class="brand">'+LOGO+'<span>Atto <b>Pedidos Online</b></span></div>'+
+  '<div class="who"><span class="who-n">'+esc(S.user.empresa)+'</span><span class="who-u">'+esc(S.user.user)+' · '+esc(S.user.papel)+'</span></div>'+
+  '<button class="btn ghost sm" data-act="contact">Falar com especialista</button><button class="btn ghost sm" data-act="logout">Sair</button></div>'+
+  '<nav class="tabs" aria-label="Seções">'+
+  tab('go','home','Início',null,S.view==='home')+tab('newBox','','Nova caixa',null,S.view==='config')+
+  tab('go','cart','Carrinho',n?'<span class="badge">'+n+'</span>':'',S.view==='cart'||S.view==='sent')+
+  tab('go','quotes','Orçamentos',null,S.view==='quotes')+tab('go','orders','Pedidos',null,S.view==='orders')+tab('go','packs','Minhas embalagens',null,S.view==='packs')+
+  '</nav></header>';
+}
+function viewLogin(){
+  return '<div class="demo">Protótipo de demonstração. Empresas, preços e prazos são fictícios e não representam a Atto Embalagens.</div>'+
+  '<div class="login"><div class="brand" style="margin:0">'+LOGO+'<span>Atto <b>Pedidos Online</b></span></div>'+
+  '<div class="stack"><h1>Monte a caixa que o seu produto precisa.</h1><p class="lead">Escolha um cliente de exemplo e faça o pedido você mesmo, ou assista a uma simulação em que ele configura a caixa passo a passo.</p></div>'+
+  '<div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(min(100%,430px),1fr))">'+PERS.map(function(p){
+    var d=p.demo;
+    return '<article class="card persona"><div class="row sp"><h3>'+esc(p.empresa)+'</h3></div>'+
+    '<div class="seg">'+pill(p.seg,'acc')+pill('Cliente fictício')+'</div>'+
+    '<dl><dt>Quem entra</dt><dd>'+esc(p.user)+', '+esc(p.papel.toLowerCase())+'</dd><dt>Quer pedir</dt><dd>'+esc(d.nome)+' ('+MODELOS[d.modelo].nome.toLowerCase()+', '+d.C+'×'+d.L+'×'+d.A+' mm, '+num(d.qty)+' un)</dd></dl>'+
+    '<p class="hint">'+esc(p.nota)+'</p>'+
+    '<div class="row"><button class="btn pri" data-act="login" data-v="'+p.id+'">Entrar como '+esc(p.user.split(' ')[0])+'</button><button class="btn" data-act="autoStart" data-v="'+p.id+'">Assistir simulação</button></div></article>';}).join('')+'</div>'+
+  '<p class="hint">Os preços usam parâmetros inventados só para esta demonstração. Os valores reais, o catálogo de modelos e os prazos dependem de informações que a Atto ainda precisa fornecer.</p></div>';
+}
+function pending(){
+  var out=[];
+  S.quotes.forEach(function(q){if(q.status==='proposta'){out.push({t:'Proposta '+q.id+' aguardando seu aceite',s:'Válida até '+fmtD(q.valida),act:'openQuote',v:q.id,l:'Ver proposta'});}});
+  S.orders.forEach(function(o){if(o.steps[o.idx]==='Prova enviada'){out.push({t:'Prova de arte do pedido '+o.id+' aguardando aprovação',s:'A produção só começa depois da sua aprovação.',act:'openOrder',v:o.id,l:'Ver prova'});}});
+  return out;
+}
+function viewHome(){
+  var p=S.user,pend=pending(),active=S.orders.filter(function(o){return o.idx<o.steps.length-1;});
+  return '<div class="stack"><p class="eyebrow">'+esc(p.seg)+'</p><h1>Olá, '+esc(p.user.split(' ')[0])+'.</h1><p class="lead">O que você precisa hoje?</p>'+
+  '<div class="row"><button class="btn pri" data-act="newBox">Configurar nova caixa</button><button class="btn" data-act="go" data-v="packs">Repetir uma embalagem</button></div></div>'+
+  (pend.length?'<section class="stack"><h2>Pede a sua ação</h2>'+pend.map(function(x){return '<div class="card act-card"><div><b>'+esc(x.t)+'</b><br><small>'+esc(x.s)+'</small></div><button class="btn pri" data-act="'+x.act+'" data-v="'+x.v+'">'+x.l+'</button></div>';}).join('')+'</section>':'')+
+  '<section class="stack"><h2>Pedidos em andamento</h2>'+(active.length?active.map(orderCard).join(''):'<div class="card empty">Nenhum pedido em andamento.</div>')+'</section>'+
+  '<section class="stack"><div class="row sp"><h2>Minhas embalagens</h2><button class="btn ghost sm" data-act="go" data-v="packs">Ver todas</button></div><div class="grid g2">'+S.packs.slice(0,2).map(packCard).join('')+'</div></section>';
+}
+function orderCard(o){
+  var last=o.idx===o.steps.length-1;
+  return '<div class="card"><div class="row sp"><div class="stack" style="gap:.15rem"><b>'+esc(o.id)+'</b><small>'+o.itens.map(function(i){return esc(i.spec.nome||MODELOS[i.spec.modelo].nome)+' ('+num(i.qty)+' un)';}).join(', ')+'</small></div>'+
+  pill(o.steps[o.idx],last?'good':'acc')+'</div><div class="row" style="margin-top:.75rem"><button class="btn sm" data-act="openOrder" data-v="'+o.id+'">Acompanhar</button><button class="btn sm" data-act="repeatOrder" data-v="'+o.id+'">Repetir pedido</button></div></div>';
+}
+function packCard(k){
+  return '<div class="card stack"><div class="row" style="flex-wrap:nowrap"><div class="thumb stage" style="width:110px;flex:none">'+boxSVG(k.spec,true)+'</div><div class="stack" style="gap:.15rem;min-width:0"><b>'+esc(k.nome)+'</b><span class="mono sm-t">'+k.spec.C+'×'+k.spec.L+'×'+k.spec.A+' mm</span><small>'+esc(summary(k.spec))+'</small></div></div>'+
+  '<div class="row sp"><small>Último pedido: '+num(k.qty)+' un a '+brl(k.ult)+'/un em '+fmtD(k.quando)+'</small></div>'+
+  '<div class="row"><button class="btn pri sm" data-act="repeatPack" data-v="'+k.id+'">Repetir</button><button class="btn sm" data-act="editPack" data-v="'+k.id+'">Editar como nova</button></div></div>';
+}
+function viewPacks(){
+  return '<div class="stack"><h1>Minhas embalagens</h1><p class="lead">Toda caixa que você já pediu fica salva com a arte aprovada. Para repetir, basta escolher a quantidade. Clichê e faca não são cobrados de novo.</p></div><div class="grid g2">'+S.packs.map(packCard).join('')+'</div>';
+}
+function viewCfg(){
+  var d=S.draft,i=S.step;
+  var stepper='<ol class="steps" aria-label="Passos do pedido">'+STEPS.map(function(n,k){return '<li class="'+(k===i?'cur':k<i?'done':'')+'"><button data-act="step" data-v="'+k+'"'+(k===i?' aria-current="step"':'')+'><span class="n">'+(k<i?'✓':(k+1))+'</span>'+n+'</button></li>';}).join('')+'</ol>';
+  return '<div class="stack"><div class="row sp"><h1>'+(S.editIdx!=null?'Editar caixa':'Nova caixa')+'</h1></div>'+stepper+'</div>'+
+  '<div class="cfg"><section class="card stack" id="step-body">'+stepBody(i)+'</section><aside class="side" id="side">'+sideHTML()+'</aside></div>';
+}
+function hint(k){
+  var d=S.draft,m=MODELOS[d.modelo],lim=m.lim[k],v=+d[k],bad=!(v>=lim[0]&&v<=lim[1]);
+  if(m.manual){return '<span class="hint">Modelo sob consulta: qualquer medida vai para cotação.</span>';}
+  return '<span class="hint'+(bad?' err':'')+'">'+(bad?'Fora do limite automático ('+lim[0]+' a '+lim[1]+' mm). O item segue para cotação personalizada.':'Entre '+lim[0]+' e '+lim[1]+' mm')+'</span>';
+}
+function stepBody(i){
+  var d=S.draft,nav='';
+  nav='<div class="row sp" style="margin-top:.5rem"><button class="btn" data-act="prev"'+(i===0?' disabled':'')+'>Voltar</button>'+(i<6?'<button class="btn pri" data-act="next"'+(i===1&&!(d.C>0&&d.L>0&&d.A>0)?' disabled':'')+'>Continuar</button>':'<button class="btn pri" data-act="addCart">'+(S.editIdx!=null?'Salvar alterações':'Adicionar ao carrinho')+'</button>')+'</div>';
+  var h='';
+  if(i===0){
+    h='<h2>Qual modelo de caixa?</h2><p class="hint">Catálogo ilustrativo da demonstração.</p><div class="opts">'+Object.keys(MODELOS).map(function(k){var m=MODELOS[k];return '<button class="opt" data-act="set" data-k="modelo" data-v="'+k+'" aria-pressed="'+(d.modelo===k)+'"><b>'+m.nome+'</b><span class="tag">'+m.fefco+'</span><small>'+m.desc+'</small></button>';}).join('')+'</div>';
+  }else if(i===1){
+    h='<h2>Quais as medidas internas?</h2><p class="hint">Meça o espaço que o produto ocupa, de dentro para dentro da caixa, em milímetros.</p><div class="grid g3">'+
+    [['C','Comprimento'],['L','Largura'],['A','Altura']].map(function(k){return '<div class="field"><label for="f-'+k[0]+'">'+k[1]+'</label><div class="unit"><input id="f-'+k[0]+'" type="number" min="1" step="1" inputmode="numeric" data-f="'+k[0]+'" value="'+d[k[0]]+'"><span>mm</span></div><div id="hint-'+k[0]+'">'+hint(k[0])+'</div></div>';}).join('')+'</div>';
+  }else if(i===2){
+    h='<h2>Qual papelão?</h2><div class="stack"><span class="lbl">Onda</span><div class="opts">'+Object.keys(ONDAS).map(function(k){var o=ONDAS[k];return '<button class="opt" data-act="set" data-k="onda" data-v="'+k+'" aria-pressed="'+(d.onda===k)+'"><b>'+o.nome+'</b><span class="tag">'+o.tipo.toLowerCase()+' · '+o.e+' mm</span><small>'+o.uso+'</small></button>';}).join('')+'</div></div>'+
+    '<div class="stack"><span class="lbl">Papel da capa</span><div class="opts"><button class="opt" data-act="set" data-k="capa" data-v="kraft" aria-pressed="'+(d.capa==='kraft')+'"><b>Kraft</b><small>Marrom natural</small></button><button class="opt" data-act="set" data-k="capa" data-v="branco" aria-pressed="'+(d.capa==='branco')+'"><b>Branco</b><small>Melhor para cores claras</small></button></div></div>'+
+    '<p class="hint">A indicação de uso é só uma orientação. A engenharia da Atto valida a resistência na proposta.</p>';
+  }else if(i===3){
+    h='<h2>A caixa leva impressão?</h2><div class="opts"><button class="opt" data-act="set" data-k="imp" data-v="0" aria-pressed="'+(!d.imp)+'"><b>Sem impressão</b><small>Caixa lisa</small></button><button class="opt" data-act="set" data-k="imp" data-v="1" aria-pressed="'+(d.imp)+'"><b>Com impressão</b><small>Flexografia em até 3 cores</small></button></div>';
+    if(d.imp){
+      h+='<div class="stack"><span class="lbl">Cores (até 3)</span><div class="swatches">'+Object.keys(COR).map(function(k){return '<button class="sw" data-act="toggleCor" data-v="'+k+'" aria-pressed="'+(d.cores.indexOf(k)>-1)+'"><i style="background:'+COR[k].hex+'"></i>'+COR[k].n+'</button>';}).join('')+'</div>'+
+      '<label class="check" aria-pressed="'+d.quatro+'"><input type="checkbox" id="f-quatro" data-f="quatro"'+(d.quatro?' checked':'')+'><span><b>Preciso de mais de 3 cores</b><br><small>Esse caso vai para cotação personalizada.</small></span></label></div>'+
+      '<div class="stack"><span class="lbl">Faces impressas</span><div class="opts">'+Object.keys(FACES).map(function(k){return '<button class="opt" data-act="set" data-k="faces" data-v="'+k+'" aria-pressed="'+(d.faces===k)+'"><b>'+FACES[k]+'</b></button>';}).join('')+'</div></div>';
+    }
+  }else if(i===4){
+    h='<h2>Algum acabamento?</h2><p class="hint">Todo acabamento passa por cotação personalizada, porque pede análise da equipe.</p><div class="opts">'+Object.keys(ACAB).map(function(k){var on=d.acab.indexOf(k)>-1;return '<button class="opt" data-act="toggleAcab" data-v="'+k+'" aria-pressed="'+on+'"><b>'+ACAB[k]+'</b><small>'+pill('Sob consulta','warn')+'</small></button>';}).join('')+'</div>';
+  }else if(i===5){
+    var c=calc(d);
+    h='<h2>Quantas unidades?</h2><div class="grid g2"><div class="field"><label for="f-qty">Quantidade</label><input id="f-qty" type="number" min="1" step="50" data-f="qty" value="'+d.qty+'"><div class="row">'+[500,1000,3000,5000].map(function(q){return '<button class="btn sm" data-act="quickQty" data-v="'+q+'">'+num(q)+'</button>';}).join('')+'</div></div>'+
+    '<div class="field"><label for="f-data">Data desejada de entrega</label><input id="f-data" type="date" data-f="data" value="'+esc(d.data)+'"><span class="hint">A Atto confirma o prazo na proposta.</span></div></div>'+
+    '<div id="qty-tbl">'+qtyTable()+'</div>';
+  }else{
+    h='<h2>Arte e revisão</h2><div class="field"><label for="f-nome">Nome desta embalagem</label><input id="f-nome" type="text" data-f="nome" placeholder="Ex.: Caixa biscoito 400 g" value="'+esc(d.nome)+'"></div>';
+    if(d.imp){
+      h+='<div class="drop"><span class="lbl">Arquivo da arte</span>'+(d.arte?'<div class="row"><span class="chip good">✓ '+esc(d.arte.nome)+'</span><small>'+(d.arte.size/1e6).toFixed(1).replace('.',',')+' MB</small><button class="btn sm" data-act="clearArte">Remover</button></div>':'<input type="file" id="arte-file" accept=".pdf,.ai,.eps,.svg,.cdr,.png,.jpg,.jpeg"><span class="hint" id="arte-msg">PDF, AI, EPS, SVG, CDR, PNG ou JPG, até 100 MB. Nada é enviado nesta demonstração.</span>')+
+      '<label class="row" style="gap:.4rem"><input type="checkbox" id="f-depois" data-f="depois"'+(d.depois?' checked':'')+'><span>Envio a arte depois</span></label></div>';
+    }else{h+='<p class="hint">Caixa sem impressão não precisa de arte.</p>';}
+    h+='<div class="field"><label for="f-obs">Observações</label><textarea id="f-obs" data-f="obs" placeholder="Algo que a equipe precisa saber?">'+esc(d.obs)+'</textarea></div>';
+  }
+  return h+nav;
+}
+function qtyTable(){
+  var d=S.draft,c=calc(d);
+  if(c.manual){return '<p class="hint">As quantidades alternativas aparecem quando o item tem estimativa automática.</p>';}
+  var list=[500,1000,2000,3000,5000,10000].filter(function(q){return q>=MINQ;});
+  var near=list.reduce(function(a,q){return Math.abs(q-d.qty)<Math.abs(a-d.qty)?q:a;},list[0]);
+  return '<div class="tbl-w"><table><thead><tr><th>Quantidade</th><th>Por unidade</th><th>Total</th></tr></thead><tbody>'+list.map(function(q){var x=calc(d,q);return '<tr'+(q===near?' class="cur"':'')+'><td class="num">'+num(q)+'</td><td class="num">'+brl(x.min)+' a '+brl(x.max)+'</td><td class="num">'+brl0(x.min*q)+' a '+brl0(x.max*q)+'</td></tr>';}).join('')+'</tbody></table></div><p class="hint">Quanto maior a quantidade, menor o valor por unidade.</p>';
+}
+function priceBox(d){
+  var c=calc(d);
+  if(c.manual){
+    return '<div class="price man"><b>Cotação personalizada</b><span>Este item precisa de análise da equipe. A resposta chega em até 1 dia útil (prazo de demonstração).</span><ul>'+c.reasons.map(function(r){return '<li>'+esc(r)+'</li>';}).join('')+'</ul></div>';
+  }
+  return '<div class="price est"><span class="eyebrow">Estimativa</span><span class="big">'+brl(c.min)+' a '+brl(c.max)+'</span><small>por unidade</small><span class="num"><b>'+brl0(c.min*c.qty)+' a '+brl0(c.max*c.qty)+'</b> para '+num(c.qty)+' un</span>'+
+  '<small>Valor estimado com base nas informações fornecidas. O preço final é confirmado pela equipe comercial após a análise técnica e da arte. Não inclui frete.</small></div>';
+}
+function sideHTML(){
+  var d=S.draft;
+  return '<div class="stage">'+boxSVG(d)+'</div>'+priceBox(d)+
+  '<dl class="card sum"><dt>Modelo</dt><dd>'+MODELOS[d.modelo].nome+' <span class="mono sm-t">'+MODELOS[d.modelo].fefco+'</span></dd><dt>Medidas</dt><dd class="mono">'+d.C+' × '+d.L+' × '+d.A+' mm</dd><dt>Papelão</dt><dd>'+ONDAS[d.onda].nome+' · '+d.capa+'</dd><dt>Impressão</dt><dd>'+(d.imp?((d.quatro?'4 ou mais':(d.cores.length||1))+' cor(es), '+FACES[d.faces].toLowerCase()):'Sem')+'</dd><dt>Acabamento</dt><dd>'+(d.acab.length?d.acab.map(function(a){return ACAB[a];}).join(', '):'Nenhum')+'</dd><dt>Quantidade</dt><dd class="num">'+num(d.qty)+' un</dd></dl>';
+}
+function cartTotals(){
+  var min=0,max=0,man=0;
+  S.cart.forEach(function(it){var c=calc(it.spec,it.qty);if(c.manual){man++;}else{min+=c.min*it.qty;max+=c.max*it.qty;}});
+  return {min:min,max:max,man:man};
+}
+function itemRow(it,actions){
+  var c=calc(it.spec,it.qty),s=it.spec;
+  return '<div class="item"><div class="thumb stage">'+boxSVG(s,true)+'</div><div class="item-b"><b>'+esc(s.nome||MODELOS[s.modelo].nome)+'</b><span class="mono sm-t">'+s.C+'×'+s.L+'×'+s.A+' mm · '+num(it.qty)+' un</span><small>'+esc(summary(s))+'</small>'+(s.imp?'<small>Arte: '+(s.arte?esc(s.arte.nome):s.depois?'será enviada depois':'pendente')+'</small>':'')+
+  (it.nota?'<small>'+esc(it.nota)+'</small>':'')+(actions?'<div class="row" style="margin-top:.3rem">'+actions+'</div>':'')+'</div>'+
+  '<div class="item-p">'+(c.manual?pill('Sob consulta','warn'):'<b>'+brl(c.min)+' a '+brl(c.max)+'</b><br><small>por unidade</small>')+'</div></div>';
+}
+function viewCart(){
+  if(!S.cart.length){return '<div class="card empty stack"><h2>Seu carrinho está vazio</h2><p>Configure uma caixa para pedir uma estimativa ou uma cotação.</p><div><button class="btn pri" data-act="newBox">Configurar nova caixa</button></div></div>';}
+  var t=cartTotals();
+  return '<div class="stack"><h1>Carrinho</h1><p class="lead">Confira os itens e envie. A equipe comercial responde com uma proposta de preço firme.</p></div>'+
+  '<div class="cfg"><section class="card">'+S.cart.map(function(it,i){return itemRow(it,'<button class="btn sm" data-act="editCart" data-v="'+i+'">Editar</button><button class="btn ghost sm" data-act="rmCart" data-v="'+i+'">Remover</button>');}).join('')+'</section>'+
+  '<aside class="side"><div class="card stack"><h3>Entrega</h3><div class="field"><label for="c-ent">Endereço</label><select id="c-ent" data-f="ent"><option'+(S.entrega===S.user.cidade?' selected':'')+'>'+esc(S.user.cidade)+'</option><option'+(S.entrega==='Centro de distribuição'?' selected':'')+'>Centro de distribuição</option></select></div><div class="field"><label for="c-obs">Observações do pedido</label><textarea id="c-obs" data-f="obsCart">'+esc(S.obsCart)+'</textarea></div></div>'+
+  '<div class="price est"><span class="eyebrow">Total estimado</span><span class="big">'+(t.max?brl0(t.min)+' a '+brl0(t.max):'Sob consulta')+'</span>'+(t.man?'<small>'+t.man+' item(ns) sem preço, a cotar pela equipe.</small>':'')+'<small>Estimativa sem frete. Preço final na proposta.</small></div>'+
+  '<button class="btn pri" data-act="sendQuote">Solicitar cotação</button></aside></div>';
+}
+function viewSent(){
+  var q=S.sent;
+  return '<div class="card stack" style="max-width:640px"><span class="chip good" style="align-self:flex-start">Cotação enviada</span><h1>Protocolo '+esc(q.id)+'</h1><p class="lead">A equipe comercial recebeu a especificação completa e responde em até 1 dia útil (prazo de demonstração). Você será avisado por e-mail e no sino do portal.</p><div class="row"><button class="btn pri" data-act="openQuote" data-v="'+q.id+'">Acompanhar cotação</button><button class="btn" data-act="go" data-v="home">Voltar ao início</button></div></div>';
+}
+var Q_ST={solicitada:'Cotação solicitada',analise:'Em análise',proposta:'Proposta enviada',aceita:'Proposta aceita',recusada:'Recusada'};
+var Q_STEPS=['Cotação solicitada','Em análise','Proposta enviada','Proposta aceita'];
+function qIdx(s){return {solicitada:0,analise:1,proposta:2,aceita:3,recusada:2}[s];}
+function viewQuotes(){
+  if(S.selQ){return viewQuote(S.quotes.filter(function(q){return q.id===S.selQ;})[0]);}
+  return '<div class="stack"><h1>Orçamentos</h1></div>'+(S.quotes.length?'<div class="stack">'+S.quotes.map(function(q){
+    var tot=q.itens.reduce(function(a,i){return a+(q.status==='proposta'||q.status==='aceita'?i.firme*i.qty:0);},0);
+    return '<div class="card row sp"><div class="stack" style="gap:.15rem"><b>'+esc(q.id)+'</b><small>'+q.itens.length+' item(ns) · criada em '+fmtD(q.criada)+'</small></div><div class="row">'+(tot?'<b class="num">'+brl0(tot)+'</b>':'')+pill(Q_ST[q.status],q.status==='proposta'?'warn':q.status==='aceita'?'good':q.status==='recusada'?'bad':'acc')+'<button class="btn sm" data-act="openQuote" data-v="'+q.id+'">Abrir</button></div></div>';}).join('')+'</div>':'<div class="card empty">Você ainda não pediu cotações.</div>');
+}
+function viewQuote(q){
+  var st=q.status,tot=q.itens.reduce(function(a,i){return a+i.firme*i.qty;},0);
+  var acts='';
+  if(st==='proposta'){acts='<button class="btn pri" data-act="acceptQuote" data-v="'+q.id+'">Aceitar proposta</button><button class="btn" data-act="refuseQuote" data-v="'+q.id+'">Recusar</button>';}
+  var demo='';
+  if(st==='solicitada'||st==='analise'){demo='<div class="card stack" style="border-style:dashed"><span class="eyebrow">Simulação · papel da equipe Atto</span><p class="hint">Na versão real, o vendedor faz isto no painel comercial.</p><div><button class="btn sm" data-act="advQuote" data-v="'+q.id+'">'+(st==='solicitada'?'Assumir cotação':'Enviar proposta firme')+'</button></div></div>';}
+  return '<div class="row"><button class="btn ghost sm" data-act="go" data-v="quotes">← Orçamentos</button></div><div class="stack"><h1>'+esc(q.id)+'</h1>'+pill(Q_ST[st],st==='proposta'?'warn':st==='aceita'?'good':st==='recusada'?'bad':'acc')+'</div>'+
+  '<div class="cfg"><section class="card">'+q.itens.map(function(i){var c=calc(i.spec,i.qty);
+    var left=(st==='proposta'||st==='aceita')?'<b>'+brl(i.firme)+'/un</b><br><small>Total '+brl0(i.firme*i.qty)+'</small>':(c.manual?pill('Sob consulta','warn'):'<b>'+brl(c.min)+' a '+brl(c.max)+'</b><br><small>estimativa</small>');
+    return '<div class="item"><div class="thumb stage">'+boxSVG(i.spec,true)+'</div><div class="item-b"><b>'+esc(i.spec.nome||MODELOS[i.spec.modelo].nome)+'</b><span class="mono sm-t">'+i.spec.C+'×'+i.spec.L+'×'+i.spec.A+' mm · '+num(i.qty)+' un</span><small>'+esc(summary(i.spec))+'</small></div><div class="item-p">'+left+'</div></div>';}).join('')+
+  (st==='proposta'?'<div class="row sp" style="padding-top:.9rem"><span>Proposta válida até <b>'+fmtD(q.valida)+'</b></span><b class="num">Total '+brl0(tot)+'</b></div><small>Preço firme, sem frete. Condições de pagamento e prazo confirmados pelo vendedor.</small>':'')+'</section>'+
+  '<aside class="side"><div class="card"><h3 style="margin-bottom:.75rem">Andamento</h3>'+(st==='recusada'?'<p>Proposta recusada.</p>':timeline(Q_STEPS,qIdx(st),q.hist))+'</div>'+(acts?'<div class="row">'+acts+'</div>':'')+demo+'<button class="btn" data-act="contact">Falar com o vendedor</button></aside></div>';
+}
+function timeline(steps,idx,hist){
+  var last=idx===steps.length-1;
+  return '<ol class="tl">'+steps.map(function(s,i){var cls=(i<idx||(last&&i===idx))?'done':(i===idx?'cur':'');return '<li class="'+cls+'"><span class="dot"></span><div><b>'+esc(s)+'</b>'+(hist&&hist[i]?'<small>'+fmtT(hist[i])+'</small>':'')+'</div></li>';}).join('')+'</ol>';
+}
+function viewOrders(){
+  if(S.selO){return viewOrder(S.orders.filter(function(o){return o.id===S.selO;})[0]);}
+  return '<div class="stack"><h1>Pedidos</h1></div><div class="stack">'+(S.orders.length?S.orders.map(orderCard).join(''):'<div class="card empty">Nenhum pedido ainda.</div>')+'</div>';
+}
+function viewOrder(o){
+  var cur=o.steps[o.idx],last=o.idx===o.steps.length-1;
+  var cli=cur==='Prova enviada'?'<div class="card act-card"><div><b>Prova de arte pronta</b><br><small>Confira cores, textos e posição. A aprovação fica registrada com data, hora e usuário.</small></div><button class="btn pri" data-act="approveProof" data-v="'+o.id+'">Aprovar prova</button></div>':'';
+  var demo=(!last&&cur!=='Prova enviada')?'<div class="card stack" style="border-style:dashed"><span class="eyebrow">Simulação · papel da equipe Atto</span><p class="hint">Na versão real, a produção atualiza o status.</p><div><button class="btn sm" data-act="advOrder" data-v="'+o.id+'">Avançar para “'+esc(o.steps[o.idx+1])+'”</button></div></div>':'';
+  return '<div class="row"><button class="btn ghost sm" data-act="go" data-v="orders">← Pedidos</button></div><div class="stack"><h1>'+esc(o.id)+'</h1>'+pill(cur,last?'good':'acc')+'</div>'+cli+
+  '<div class="cfg"><section class="card">'+o.itens.map(function(i){return itemRow({spec:i.spec,qty:i.qty});}).join('')+'</section><aside class="side"><div class="card"><h3 style="margin-bottom:.75rem">Linha do tempo</h3>'+timeline(o.steps,o.idx,o.hist)+'</div>'+demo+'<div class="row"><button class="btn pri" data-act="repeatOrder" data-v="'+o.id+'">Repetir pedido</button><button class="btn" data-act="contact">Falar com a Atto</button></div></aside></div>';
+}
+function modalHTML(){
+  if(!S.modal){return '';}
+  var msg='Olá! Sobre o '+(S.selQ||S.selO||'meu pedido')+': ';
+  return '<div class="modal-b" data-act="closeModal"><div class="modal" role="dialog" aria-modal="true" aria-label="Falar com a equipe comercial" data-stop="1"><h2>Falar com a equipe comercial</h2><p>Seu vendedor de carteira: <b>'+esc(S.user?'Marcos (exemplo)':'')+'</b></p>'+
+  '<div class="stack" style="gap:.3rem"><span class="lbl">Telefones da Atto (obtidos em fontes públicas)</span><div class="copybox">(62) 3928-9599<br>(62) 3928-9600</div><small>WhatsApp comercial: número a confirmar com a Atto.</small></div>'+
+  '<div class="stack" style="gap:.3rem"><span class="lbl">Mensagem pronta</span><div class="copybox" id="msgbox">'+esc(msg)+'</div></div><div class="row"><button class="btn pri" data-act="copy">Copiar mensagem</button><button class="btn" data-act="closeModal">Fechar</button></div></div></div>';
+}
+function autoBar(){
+  if(!S.auto){return '';}
+  return '<div class="autobar" role="status"><span class="msg">'+(S.auto.run?'<span class="pulse"></span>':'')+'<b>'+esc(S.auto.who)+':</b> '+esc(S.auto.msg)+'</span><button class="btn sm" data-act="autoStop">'+(S.auto.run?'Parar simulação':'Fechar')+'</button></div>';
+}
+
+/* ===== Render ===== */
+function render(){
+  var app=$('#app');
+  if(!S.user){app.innerHTML=viewLogin()+autoBar();return;}
+  var v=S.view,body='';
+  if(v==='home'){body=viewHome();}else if(v==='config'){body=viewCfg();}else if(v==='cart'){body=viewCart();}else if(v==='sent'){body=viewSent();}
+  else if(v==='quotes'){body=viewQuotes();}else if(v==='orders'){body=viewOrders();}else if(v==='packs'){body=viewPacks();}
+  app.innerHTML=header()+'<main class="wrap">'+body+'</main>'+autoBar()+modalHTML();
+}
+function refreshSide(){var el=$('#side');if(el){el.innerHTML=sideHTML();}['C','L','A'].forEach(function(k){var h=$('#hint-'+k);if(h){h.innerHTML=hint(k);}});var t=$('#qty-tbl');if(t){t.innerHTML=qtyTable();}}
+
+/* ===== Ações ===== */
+function newDraft(base){S.draft=mk(base);S.step=0;S.editIdx=null;}
+function addCart(){
+  var d=S.draft;
+  if(!d.nome){d.nome=MODELOS[d.modelo].nome+' '+d.C+'×'+d.L+'×'+d.A;}
+  var hit=S.packs.filter(function(k){return hashSpec(k.spec)===hashSpec(d);})[0];
+  var it={spec:clone(d),qty:d.qty};
+  if(hit){it.spec.recompra=true;it.nota='Mesma especificação de “'+hit.nome+'”: clichê e faca não são cobrados de novo.';}
+  if(S.editIdx!=null){S.cart[S.editIdx]=it;}else{S.cart.push(it);}
+  S.editIdx=null;S.view='cart';
+}
+function sendQuote(){
+  var q={id:'COT-'+new Date().getFullYear()+'-'+(S.seq.c++),status:'solicitada',criada:new Date(),entrega:S.entrega,valida:null,hist:[new Date()],itens:S.cart.map(function(it){var c=calc(it.spec,it.qty);return {spec:it.spec,qty:it.qty,mid:c.mid,manual:c.manual,firme:c.mid*(c.manual?1.15:1)};})};
+  S.quotes.unshift(q);S.cart=[];S.sent=q;S.view='sent';return q;
+}
+function advQuote(id){
+  var q=S.quotes.filter(function(x){return x.id===id;})[0];
+  if(q.status==='solicitada'){q.status='analise';}else if(q.status==='analise'){q.status='proposta';q.valida=new Date(Date.now()+7*86400000);}
+  q.hist.push(new Date());
+}
+function acceptQuote(id){
+  var q=S.quotes.filter(function(x){return x.id===id;})[0];q.status='aceita';q.hist.push(new Date());
+  var o=mkOrder(q.itens.map(function(i){return {spec:i.spec,qty:i.qty,mid:i.firme};}),0,0,q.id);S.orders.unshift(o);
+  q.itens.forEach(function(i){var h=hashSpec(i.spec);if(!S.packs.some(function(k){return hashSpec(k.spec)===h;})){S.packs.unshift({id:'k'+Date.now()+Math.random(),nome:i.spec.nome,spec:clone(i.spec),qty:i.qty,ult:i.firme,quando:new Date()});}});
+  return o;
+}
+function advOrder(id){var o=S.orders.filter(function(x){return x.id===id;})[0];if(o.idx<o.steps.length-1){o.idx++;o.hist.push(new Date());}}
+function repeatSpec(spec,qty,nome){
+  var s=clone(spec);s.recompra=true;s.nome=nome||s.nome;
+  var old=S.packs.filter(function(k){return hashSpec(k.spec)===hashSpec(s);})[0];
+  var c=calc(s,qty),it={spec:s,qty:qty,nota:'Clichê e faca já pagos: não entram no preço.'};
+  if(old&&!c.manual){var diff=c.mid-old.ult;it.nota+=' Último preço: '+brl(old.ult)+'/un. '+(Math.abs(diff)<.005?'O preço não mudou.':'Preço atual estimado '+(diff>0?'maior':'menor')+' em '+brl(Math.abs(diff))+'/un.');}
+  S.cart.push(it);S.view='cart';toast('Itens copiados para o carrinho.');
+}
+var TOP=['login','go','newBox','step','next','prev','addCart','editCart','sendQuote','openQuote','openOrder','acceptQuote','repeatOrder','repeatPack','editPack'];
+function act(a,v,el){
+  switch(a){
+    case 'login':doLogin(v);break;
+    case 'logout':S.user=null;S.view='login';S.auto=null;break;
+    case 'go':S.view=v;S.selQ=null;S.selO=null;break;
+    case 'newBox':newDraft();S.view='config';break;
+    case 'step':S.step=+v;break;
+    case 'next':S.step=Math.min(6,S.step+1);break;
+    case 'prev':S.step=Math.max(0,S.step-1);break;
+    case 'set':{var d=S.draft;if(el.dataset.k==='imp'){d.imp=v==='1';if(!d.imp){d.cores=[];d.quatro=false;}}else{d[el.dataset.k]=v;}break;}
+    case 'toggleCor':{var cs=S.draft.cores,i=cs.indexOf(v);if(i>-1){cs.splice(i,1);}else if(cs.length<3){cs.push(v);}else{toast('O limite automático é de 3 cores. Marque “mais de 3 cores” para pedir cotação.');}break;}
+    case 'toggleAcab':{var ac=S.draft.acab,j=ac.indexOf(v);if(j>-1){ac.splice(j,1);}else{ac.push(v);}break;}
+    case 'quickQty':S.draft.qty=+v;break;
+    case 'clearArte':S.draft.arte=null;break;
+    case 'addCart':addCart();break;
+    case 'rmCart':S.cart.splice(+v,1);break;
+    case 'editCart':S.draft=clone(S.cart[+v].spec);S.draft.qty=S.cart[+v].qty;S.editIdx=+v;S.step=0;S.view='config';break;
+    case 'sendQuote':sendQuote();break;
+    case 'openQuote':S.view='quotes';S.selQ=v;break;
+    case 'openOrder':S.view='orders';S.selO=v;break;
+    case 'advQuote':advQuote(v);break;
+    case 'acceptQuote':{var o=acceptQuote(v);toast('Proposta aceita. Pedido '+o.id+' criado.');S.view='orders';S.selO=o.id;break;}
+    case 'refuseQuote':{var q=S.quotes.filter(function(x){return x.id===v;})[0];q.status='recusada';toast('Proposta recusada.');break;}
+    case 'advOrder':advOrder(v);break;
+    case 'approveProof':{var oo=S.orders.filter(function(x){return x.id===v;})[0];advOrder(v);toast('Prova aprovada em '+fmtT(new Date())+' por '+S.user.user+'.');break;}
+    case 'repeatOrder':{var or=S.orders.filter(function(x){return x.id===v;})[0];or.itens.forEach(function(i){repeatSpec(i.spec,i.qty);});break;}
+    case 'repeatPack':{var k=S.packs.filter(function(x){return x.id===v;})[0];repeatSpec(k.spec,k.qty,k.nome);break;}
+    case 'editPack':{var k2=S.packs.filter(function(x){return x.id===v;})[0];newDraft(k2.spec);S.draft.recompra=false;S.draft.nome=k2.nome+' (nova)';S.draft.qty=k2.qty;S.view='config';break;}
+    case 'contact':S.modal=true;break;
+    case 'closeModal':S.modal=false;break;
+    case 'copy':copyMsg();return;
+    case 'autoStart':autoRun(v);return;
+    case 'autoStop':S.auto=null;break;
+  }
+  render();if(TOP.indexOf(a)>-1){window.scrollTo(0,0);}
+}
+function copyMsg(){
+  var t=$('#msgbox').textContent;
+  function fb(){var r=document.createRange();r.selectNodeContents($('#msgbox'));var s=window.getSelection();s.removeAllRanges();s.addRange(r);toast('Texto selecionado. Copie com Ctrl+C.');}
+  try{navigator.clipboard.writeText(t).then(function(){toast('Mensagem copiada.');},fb);}catch(e){fb();}
+}
+function fileChosen(t){
+  var f=t.files&&t.files[0];if(!f){return;}
+  var ext=f.name.split('.').pop().toLowerCase(),msg=$('#arte-msg');
+  if(EXT.indexOf(ext)<0){msg.textContent='Formato .'+ext+' não é aceito. Use PDF, AI, EPS, SVG, CDR, PNG ou JPG.';msg.className='hint err';t.value='';return;}
+  if(f.size>100*1048576){msg.textContent='O arquivo passa de 100 MB. Envie uma versão menor.';msg.className='hint err';t.value='';return;}
+  S.draft.arte={nome:f.name,size:f.size};render();
+}
+document.addEventListener('click',function(e){
+  var b=e.target.closest('[data-act]');if(!b||b.disabled){return;}
+  if(b.classList.contains('modal-b')&&e.target!==b){return;}
+  act(b.dataset.act,b.dataset.v,b);
+});
+document.addEventListener('input',function(e){
+  var t=e.target,f=t.dataset&&t.dataset.f;if(!f){return;}
+  var d=S.draft;
+  if(f==='C'||f==='L'||f==='A'||f==='qty'){d[f]=+t.value||0;refreshSide();var nx=document.querySelector('[data-act="next"]');if(nx&&S.step===1){nx.disabled=!(d.C>0&&d.L>0&&d.A>0);}}
+  else if(f==='nome'||f==='obs'||f==='data'){d[f]=t.value;if(f==='obs'){refreshSide();}}
+  else if(f==='obsCart'){S.obsCart=t.value;}
+});
+document.addEventListener('change',function(e){
+  var t=e.target;if(t.id==='arte-file'){fileChosen(t);return;}
+  var f=t.dataset&&t.dataset.f;if(!f){return;}
+  if(f==='quatro'){S.draft.quatro=t.checked;render();}
+  else if(f==='depois'){S.draft.depois=t.checked;}
+  else if(f==='ent'){S.entrega=t.value;}
+});
+document.addEventListener('keydown',function(e){if(e.key==='Escape'&&S.modal){S.modal=false;render();}});
+
+/* ===== Simulação automática ===== */
+function wait(ms){return new Promise(function(r){setTimeout(r,ms);});}
+async function autoRun(pid){
+  var p=PERS.filter(function(x){return x.id===pid;})[0],first=p.user.split(' ')[0],dm=p.demo;
+  S.user=null;S.auto={who:first,msg:'',run:true};
+  async function say(msg,fn,ms){if(!S.auto||!S.auto.run){throw new Error('stop');}S.auto.msg=msg;if(fn){fn();}render();await wait(ms||1700);}
+  try{
+    await say('entra no portal com o CNPJ da '+p.empresa+'.',function(){doLogin(pid);},1900);
+    await say('vê o painel: pedidos em andamento e uma proposta esperando aceite.',null,2000);
+    await say('clica em “Nova caixa”.',function(){newDraft();S.view='config';S.draft.nome=dm.nome;},1500);
+    await say('escolhe o modelo: '+MODELOS[dm.modelo].nome.toLowerCase()+'.',function(){S.draft.modelo=dm.modelo;},1800);
+    await say('informa as medidas internas: '+dm.C+' × '+dm.L+' × '+dm.A+' mm.',function(){S.step=1;S.draft.C=dm.C;S.draft.L=dm.L;S.draft.A=dm.A;},2200);
+    await say('escolhe o papelão: '+ONDAS[dm.onda].nome+', capa '+dm.capa+'.',function(){S.step=2;S.draft.onda=dm.onda;S.draft.capa=dm.capa;},2000);
+    await say('define a impressão: '+dm.cores.length+' cor(es), '+FACES[dm.faces].toLowerCase()+'.',function(){S.step=3;S.draft.imp=true;S.draft.cores=dm.cores.slice();S.draft.faces=dm.faces;},2400);
+    await say(dm.acab.length?'marca um acabamento. O sistema avisa que isso vai para cotação.':'não precisa de acabamento especial.',function(){S.step=4;S.draft.acab=dm.acab.slice();},2200);
+    await say('informa a quantidade: '+num(dm.qty)+' unidades. A tabela mostra quanto o preço cai com mais volume.',function(){S.step=5;S.draft.qty=dm.qty;},2600);
+    await say('envia a arte ('+dm.arte.nome+') e escreve uma observação.',function(){S.step=6;S.draft.arte=dm.arte;S.draft.obs=dm.obs;},2600);
+    await say('revisa a estimativa e adiciona ao carrinho.',null,2000);
+    await say('adiciona a caixa ao carrinho.',function(){addCart();},1800);
+    await say('solicita a cotação.',function(){sendQuote();},2200);
+    await say('acompanha a cotação. Agora a equipe da Atto assume o pedido.',function(){var q=S.sent;S.view='quotes';S.selQ=q.id;advQuote(q.id);},2200);
+    await say('a Atto envia a proposta firme, com preço e validade.',function(){advQuote(S.selQ);},2400);
+    await say('aceita a proposta. O pedido é criado.',function(){var o=acceptQuote(S.selQ);S.view='orders';S.selO=o.id;},2400);
+    await say('a Atto envia a prova de arte.',function(){advOrder(S.selO);advOrder(S.selO);},2200);
+    await say('aprova a prova. A aprovação fica registrada e a produção começa.',function(){advOrder(S.selO);advOrder(S.selO);},2600);
+    S.auto.run=false;S.auto.msg='fim da simulação. Você pode mexer em tudo: repetir o pedido, abrir as minhas embalagens ou configurar outra caixa.';render();
+  }catch(e){if(e.message!=='stop'){S.auto=null;render();throw e;}}
+}
+
+render();
+})();
+</script>
+
+</body>
+</html>

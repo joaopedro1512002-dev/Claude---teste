@@ -208,7 +208,7 @@ O pedido nasce num configurador de 7 passos, passa por uma decisão automática 
 
 | Passo | O cliente informa | Validações | Ajuda na tela |
 | --- | --- | --- | --- |
-| 1. Modelo | Tipo de caixa: maleta (FEFCO 0201), meia maleta (0200), corte e vinco, tampa e fundo, ou "outro: descreva" \[LACUNA: catálogo real\] | Obrigatório | Ilustração de cada modelo e usos típicos |
+| 1. Modelo | Tipo de caixa: maleta (FEFCO 0201), caixa de envio (FEFCO 0427), tampa e fundo, ou "outro: descreva" \[LACUNA: catálogo real\] | Obrigatório | Ilustração de cada modelo e usos típicos |
 | 2. Medidas | Comprimento, largura e altura **internas** em mm ou cm; peso do conteúdo (opcional) | Faixas mínima e máxima por modelo \[LACUNA: limites de máquina\]; C ≥ L para maleta | Desenho explicando medida interna; prévia em escala |
 | 3. Material | Onda (simples ou dupla, ex.: B, C, BC), papel de capa (kraft ou branco), resistência \[LACUNA: opções reais\] | Combinações inválidas bloqueadas | Assistente de resistência (fase 2); glossário |
 | 4. Impressão | Sem impressão, ou 1 a 3 cores em flexografia; faces impressas; cores (Pantone ou referência) | Máximo de 3 cores, que é o limite citado pela Atto; acima disso, cotação manual | Exemplo de 1, 2 e 3 cores; aviso de que flexografia não é fotográfica |
@@ -493,7 +493,7 @@ O MVP entrega o ciclo completo de configurar, estimar, cotar, aprovar e acompanh
 | Entra no MVP | Fica para depois |
 | --- | --- |
 | Cadastro PJ com CNPJ, multiusuário e papéis básicos | SSO, aprovação multinível com limites de valor |
-| Configurador com 3 modelos padrão (sugestão: maleta 0201, meia maleta 0200, corte e vinco simples) e "outro" para cotação | Catálogo completo, assistente de resistência, prévia 3D |
+| Configurador com 3 modelos padrão (sugestão: maleta 0201, caixa de envio 0427, tampa e fundo) e "outro" para cotação | Catálogo completo, assistente de resistência, prévia 3D |
 | Estimativa em faixa com regras de cotação manual | Recomendação automática de material |
 | Upload de arte com versionamento e aprovação de prova | Gabarito em PDF gerado automaticamente, mockup com a arte |
 | Carrinho, solicitação de cotação, proposta firme em PDF e aceite | Pagamento online e análise de crédito |
